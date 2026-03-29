@@ -1,6 +1,7 @@
 import Gio from "gi://Gio";
 import Meta from "gi://Meta";
 import * as AltTab from "resource:///org/gnome/shell/ui/altTab.js";
+import * as SwitcherPopup from "resource:///org/gnome/shell/ui/switcherPopup.js";
 import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 import Mtk from "gi://Mtk";
 import * as Main from "resource:///org/gnome/shell/ui/main.js";
@@ -12,6 +13,7 @@ export default class AltTabCurrentMonitorExtension extends Extension {
     private gsettings?: Gio.Settings;
     private originalWindowSwitcherPopupGetWindows: any = null;
     private originalWindowCyclerPopupGetWindows: any = null;
+    private originalSwitcherPopupShow: any = null;
     private useMouseMonitor: boolean = true;
     private preventFocusOnOtherDisplays: boolean = true;
     private enableDebugging: boolean = false;
@@ -63,6 +65,36 @@ export default class AltTabCurrentMonitorExtension extends Extension {
             return self.filterWindows(windows);
         };
 
+        // Override SwitcherPopup.show() to temporarily swap
+        // Main.layoutManager.primaryMonitor with the current monitor.
+        // This works because show() is a regular JS method (not a GObject vfunc),
+        // and all the layout code (vfunc_allocate, _setIconSize, etc.) reads
+        // primaryMonitor during the popup's lifecycle.
+        this.originalSwitcherPopupShow = SwitcherPopup.SwitcherPopup.prototype.show;
+
+        (SwitcherPopup.SwitcherPopup.prototype as any).show = function (backward: boolean, binding: string, mask: number) {
+            const realPrimaryMonitor = Main.layoutManager.primaryMonitor;
+            const currentMonitorGeo = self._getMonitorGeometryForPopup();
+
+            // Swap primaryMonitor to our current monitor
+            (Main.layoutManager as any).primaryMonitor = currentMonitorGeo;
+
+            const result = self.originalSwitcherPopupShow.call(this, backward, binding, mask);
+
+            if (result) {
+                // Popup is shown and will stay open — restore on destroy
+                (this as any).connect("destroy", () => {
+                    (Main.layoutManager as any).primaryMonitor = realPrimaryMonitor;
+                    self.logDebug("Restored primaryMonitor after popup destroy");
+                });
+            } else {
+                // Popup was not shown (e.g. no windows), restore immediately
+                (Main.layoutManager as any).primaryMonitor = realPrimaryMonitor;
+            }
+
+            return result;
+        };
+
         // Listen for settings changes
         this.settingsChangedId.push(
             this.gsettings.connect("changed::use-mouse-monitor", () => {
@@ -110,6 +142,12 @@ export default class AltTabCurrentMonitorExtension extends Extension {
         if (this.originalWindowCyclerPopupGetWindows) {
             AltTab.WindowCyclerPopup.prototype._getWindows = this.originalWindowCyclerPopupGetWindows;
             this.originalWindowCyclerPopupGetWindows = null;
+        }
+
+        // Restore SwitcherPopup show
+        if (this.originalSwitcherPopupShow) {
+            (SwitcherPopup.SwitcherPopup.prototype as any).show = this.originalSwitcherPopupShow;
+            this.originalSwitcherPopupShow = null;
         }
 
         // Restore workspace switching methods
@@ -201,6 +239,24 @@ export default class AltTabCurrentMonitorExtension extends Extension {
             this.logWarning("No focused window, falling back to primary monitor");
             return global.display.get_primary_monitor();
         }
+    }
+
+    /**
+     * Get the monitor geometry for positioning the switcher popup.
+     * Returns the Monitor object for the current monitor (by mouse or focused window).
+     * We return the actual Monitor object from layoutManager.monitors so it has
+     * all the same properties as primaryMonitor (index, geometry_scale, inFullscreen, etc.)
+     */
+    private _getMonitorGeometryForPopup(): any {
+        const monitorIndex = this.getCurrentMonitor();
+        const monitor = (Main.layoutManager as any).monitors[monitorIndex];
+        if (monitor) {
+            this.logDebug(`Popup will use monitor ${monitorIndex}: ${monitor.x},${monitor.y} ${monitor.width}x${monitor.height}`);
+            return monitor;
+        }
+        // Fallback to primary monitor if something goes wrong
+        this.logWarning("Could not get monitor object, falling back to primary monitor");
+        return Main.layoutManager.primaryMonitor;
     }
 
     private _setupWorkspaceSwitchHandlers(): void {
