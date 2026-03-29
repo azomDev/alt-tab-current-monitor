@@ -5,10 +5,5 @@
     "url": "https://github.com/esauvisky/alt-tab-current-monitor",
     "settings-schema": "org.gnome.shell.extensions.alt-tab-current-monitor",
     "version": "2.2.0",
-    "shell-version": [
-        "46",
-        "47",
-        "48",
-        "49"
-    ]
+    "shell-version": ["46", "47", "48", "49"]
 }

@@ -322,7 +322,9 @@ export default class AltTabCurrentMonitorExtension extends Extension {
                     self.logDebug(`Total windows on workspace ${workspaceIndexAfter}: ${windows.length}`);
 
                     // Filter windows on the current monitor
-                    const windowsOnCurrentMonitor = windows.filter((window) => window.get_monitor() === currentMonitor && !window.is_skip_taskbar());
+                    const windowsOnCurrentMonitor = windows.filter(
+                        (window) => window.get_monitor() === currentMonitor && !window.is_skip_taskbar(),
+                    );
 
                     self.logDebug(`Windows on monitor ${currentMonitor}: ${windowsOnCurrentMonitor.length}`);
                     windowsOnCurrentMonitor.forEach((window, i) => {

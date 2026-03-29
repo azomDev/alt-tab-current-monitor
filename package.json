@@ -1,35 +1,36 @@
 {
-  "name": "alt-tab-current-monitor",
-  "version": "2.2.0",
-  "description": "GNOME Shell extension that makes Alt+Tab only show/cycle windows from the current monitor",
-  "type": "module",
-  "private": true,
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/esauvisky/alt-tab-current-monitor.git"
-  },
-  "author": "Emi Bemol",
-  "license": "GPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/esauvisky/alt-tab-current-monitor/issues"
-  },
-  "homepage": "https://github.com/esauvisky/alt-tab-current-monitor#readme",
-  "sideEffects": false,
-  "scripts": {
-    "build": "npm install && tsc",
-    "compile-schemas": "glib-compile-schemas schemas",
-    "prepare-dist": "mkdir -p dist && cp -r schemas dist/ && cp metadata.json dist/",
-    "pack": "npm run build && npm run compile-schemas && npm run prepare-dist && cd dist && zip -r ../alt-tab-current-monitor.zip .",
-    "clean": "rm -rf dist node_modules alt-tab-current-monitor.zip",
-    "install-extension": "gnome-extensions disable alt-tab-current-monitor@esauvisky.github.io; npm run pack && gnome-extensions install alt-tab-current-monitor.zip --force && gnome-extensions enable alt-tab-current-monitor@esauvisky.github.io"
-  },
-  "devDependencies": {
-    "eslint": "^9.23.0",
-    "eslint-plugin-jsdoc": "^50.6.9",
-    "typescript": "^5.8.2"
-  },
-  "dependencies": {
-    "@girs/gjs": "^4.0.0-beta.23",
-    "@girs/gnome-shell": "^48.0.2"
-  }
+    "name": "alt-tab-current-monitor",
+    "version": "2.2.0",
+    "description": "GNOME Shell extension that makes Alt+Tab only show/cycle windows from the current monitor",
+    "type": "module",
+    "private": true,
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/esauvisky/alt-tab-current-monitor.git"
+    },
+    "author": "Emi Bemol",
+    "license": "GPL-3.0-or-later",
+    "bugs": {
+        "url": "https://github.com/esauvisky/alt-tab-current-monitor/issues"
+    },
+    "homepage": "https://github.com/esauvisky/alt-tab-current-monitor#readme",
+    "sideEffects": false,
+    "scripts": {
+        "build": "npm install && tsc",
+        "compile-schemas": "glib-compile-schemas schemas",
+        "prepare-dist": "mkdir -p dist && cp -r schemas dist/ && cp metadata.json dist/",
+        "pack": "npm run build && npm run compile-schemas && npm run prepare-dist && cd dist && zip -r ../alt-tab-current-monitor.zip .",
+        "clean": "rm -rf dist node_modules alt-tab-current-monitor.zip",
+        "install-extension": "gnome-extensions disable alt-tab-current-monitor@esauvisky.github.io; npm run pack && gnome-extensions install alt-tab-current-monitor.zip --force && gnome-extensions enable alt-tab-current-monitor@esauvisky.github.io"
+    },
+    "devDependencies": {
+        "eslint": "^9.23.0",
+        "eslint-plugin-jsdoc": "^50.6.9",
+        "prettier": "^3.8.1",
+        "typescript": "^5.8.2"
+    },
+    "dependencies": {
+        "@girs/gjs": "^4.0.0-beta.23",
+        "@girs/gnome-shell": "^48.0.2"
+    }
 }
