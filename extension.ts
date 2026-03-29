@@ -291,6 +291,12 @@ export default class AltTabCurrentMonitorExtension extends Extension {
 
             // We'll handle focus after the workspace switch instead of trying to unfocus before
             self._tick().then(() => {
+                // Don't mess with focus when the overview is visible — let GNOME handle it
+                if (Main.overview.visible) {
+                    self.logDebug("Overview is visible, skipping focus management");
+                    return;
+                }
+
                 const workspaceIndexAfter = global.workspace_manager.get_active_workspace_index();
                 const activeWorkspace = global.workspace_manager.get_active_workspace();
                 const focusedWindowAfter = global.display.focus_window;
