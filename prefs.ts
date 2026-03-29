@@ -4,9 +4,8 @@ import Gtk from "gi://Gtk";
 import { ExtensionPreferences, gettext as _ } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";
 
 export default class AltTabCurrentMonitorPreferences extends ExtensionPreferences {
-    fillPreferencesWindow(window: Adw.PreferencesWindow): Promise<void> {
-        // @ts-ignore
-        window._settings = this.getSettings();
+    async fillPreferencesWindow(window: Adw.PreferencesWindow): Promise<void> {
+        const settings = this.getSettings();
 
         const page = new Adw.PreferencesPage({
             title: _("Settings"),
@@ -59,15 +58,14 @@ export default class AltTabCurrentMonitorPreferences extends ExtensionPreference
                 'Hold this key while using Alt+Tab to show windows from other monitors. Set to "Disabled" to turn off this feature.',
             ),
             model: new Gtk.StringList({
-                strings: modifierKeys.map(([_, label]) => label),
+                strings: modifierKeys.map(([, label]) => label),
             }),
         });
         behaviorGroup.add(otherMonitorsModifierKey);
 
         // Set the initial value
-        // @ts-ignore
-        const currentModifier = window._settings.get_string("other-monitors-modifier-key");
-        const modifierIndex = modifierKeys.findIndex(([value, _]) => value === currentModifier);
+        const currentModifier = settings.get_string("other-monitors-modifier-key");
+        const modifierIndex = modifierKeys.findIndex(([value]) => value === currentModifier);
         if (modifierIndex !== -1) {
             otherMonitorsModifierKey.selected = modifierIndex;
         }
@@ -75,9 +73,8 @@ export default class AltTabCurrentMonitorPreferences extends ExtensionPreference
         // Connect the signal
         otherMonitorsModifierKey.connect("notify::selected", () => {
             const selected = otherMonitorsModifierKey.selected;
-            if (selected >= 0 && selected < modifierKeys.length) {
-                // @ts-ignore
-                window._settings.set_string("other-monitors-modifier-key", modifierKeys[selected][0]);
+            if (selected < modifierKeys.length) {
+                settings.set_string("other-monitors-modifier-key", modifierKeys[selected][0]);
             }
         });
 
@@ -98,13 +95,8 @@ export default class AltTabCurrentMonitorPreferences extends ExtensionPreference
 
         window.add(page);
 
-        // @ts-ignore
-        window._settings.bind("use-mouse-monitor", useMouseMonitor, "active", Gio.SettingsBindFlags.DEFAULT);
-        // @ts-ignore
-        window._settings.bind("prevent-focus-on-other-displays", preventFocusOnOtherDisplays, "active", Gio.SettingsBindFlags.DEFAULT);
-        // @ts-ignore
-        window._settings.bind("enable-debugging", enableDebugging, "active", Gio.SettingsBindFlags.DEFAULT);
-
-        return Promise.resolve();
+        settings.bind("use-mouse-monitor", useMouseMonitor, "active", Gio.SettingsBindFlags.DEFAULT);
+        settings.bind("prevent-focus-on-other-displays", preventFocusOnOtherDisplays, "active", Gio.SettingsBindFlags.DEFAULT);
+        settings.bind("enable-debugging", enableDebugging, "active", Gio.SettingsBindFlags.DEFAULT);
     }
 }
