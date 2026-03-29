@@ -5,6 +5,7 @@ A GNOME Shell extension that makes Alt+Tab only show windows from the current mo
 ## Features
 
 - **Monitor-Specific Alt+Tab**: Only shows windows from your current monitor in Alt+Tab
+- **Popup on Current Monitor**: The Alt+Tab popup appears on the monitor you're using, not always the primary monitor
 - **Cross-Monitor Switching**: Hold a modifier key (Shift by default) with Alt+Tab to see windows from other monitors
 - **Focus Protection**: Maintains focus on the current monitor when switching workspaces
 - **Multiple Switcher Support**: Works with both window switcher and app switcher
@@ -17,21 +18,17 @@ A GNOME Shell extension that makes Alt+Tab only show windows from the current mo
 If you use multiple monitors, you've probably experienced the frustration of Alt+Tab showing windows from all monitors, making it difficult to quickly switch between applications on your current screen. This extension solves that problem by:
 
 1. Limiting Alt+Tab to only show windows from the monitor you're currently using
-2. Preventing focus from jumping between monitors when switching workspaces
-3. Creating a more predictable window switching experience
+2. Showing the Alt+Tab popup on the monitor you're actually using
+3. Preventing focus from jumping between monitors when switching workspaces
+4. Creating a more predictable window switching experience
 
 This is especially useful for multi-monitor setups with "Workspaces on primary display only" enabled.
 
 ## Installation
 
-### From GNOME Extensions Website
-Visit [extensions.gnome.org](https://extensions.gnome.org) and search for "Alt-Tab Current Monitor"
-
-### Manual Installation
-1. Clone this repository: `git clone https://github.com/esauvisky/alt-tab-current-monitor.git`
+1. Clone this repository: `git clone https://github.com/azomDev/alt-tab-current-monitor.git`
 2. Install dependencies: `npm install`
-3. Build and pack: `npm run pack`
-4. Install the extension: `npm run install-extension`
+3. Build and install: `npm run install-extension`
 
 ## Configuration
 
@@ -56,12 +53,12 @@ If you experience any issues:
 
 1. Enable debugging logs in the extension preferences
 2. Check the logs with: `journalctl -f -o cat /usr/bin/gnome-shell`
-3. [Open an issue](https://github.com/esauvisky/alt-tab-current-monitor/issues) with the log output
+3. [Open an issue](https://github.com/azomDev/alt-tab-current-monitor/issues) with the log output
 
 ## License
 
 This extension is licensed under the GPL-3.0 License.
 
-## Author
+## Original Author
 
 Emi Bemol ([@esauvisky](https://github.com/esauvisky))
